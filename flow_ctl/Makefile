@@ -42,7 +42,7 @@ include $(RTE_SDK)/mk/rte.vars.mk
 APP = arbiter
 
 # all source are stored in SRCS-y
-SRCS-y := main.c kfifo.c  sft_queue.c tc_queue.c session_mgr.c session_config.c tcp_pack.c ip_frag.c tc_config.c tc_frame_fwd.c global.c h_cache.c study_tbl.c pattern_tbl.c list.c init.c rules.c mstring.c utils.c app_class_tbl.c session_tbl.c acsmx2.c dpi.c sft_statictics.c export.c dpi_dynamic.c domain_tbl.c dynamic_tbl.c dns.c dpi_log.c ftp.c dns_study_tbl.c fixed_length_dpi.c stat.c dpi_login_analysis.c shared_user_tbl.c 
+SRCS-y := main.c kfifo.c  sft_queue.c tc_queue.c session_mgr.c session_config.c tcp_pack.c ip_frag.c tc_config.c tc_frame_fwd.c global.c h_cache.c study_tbl.c pattern_tbl.c list.c init.c rules.c mstring.c utils.c app_class_tbl.c session_tbl.c acsmx2.c dpi.c sft_statictics.c export.c dpi_dynamic.c domain_tbl.c dynamic_tbl.c dns.c dpi_log.c ftp.c dns_study_tbl.c fixed_length_dpi.c stat.c dpi_login_analysis.c shared_user_tbl.c timer.c 
 CFLAGS += -g $(USER_FLAGS) -lurcu -lpcap  
 CFLAGS += $(WERROR_FLAGS)
 
