@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "h_cache.h"
 #include "mstring.h"
+#include "timer.h"
 //#include "dpi_log.h"
 
 #define KEY_LIB_PATH "/opt/utc/keylib/"
@@ -161,6 +162,8 @@ static void init_pv()
     if (test_flags_dpi_enable()) 
         pv.dpi_ctrl = DPI_ENABLE; 
 
+    
+    init_timers();
     for (i = 0; i < MAX_DPI_FILE_TYPE; i ++) {
         pv.dpi_conf[i].conf_type_name = strdup(file_type[i]);
         INIT_LIST_HEAD(&pv.dpi_conf[i].conf_head);
