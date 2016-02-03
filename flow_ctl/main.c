@@ -87,6 +87,7 @@
 #include "rules.h"
 #include "debug.h"
 #include "stat.h"
+#include "timer.h"
 
 #include <pcap.h>
 
@@ -1726,6 +1727,8 @@ main_loop(__attribute__((unused)) void *dummy)
         return;
     }
     init_resouce_for_each_core(lcore_id);
+
+//test timer by zebra
     while (1) {
         cur_tsc = rte_rdtsc();
         cur_tsc_power = cur_tsc;
@@ -2681,7 +2684,6 @@ main(int argc, char **argv)
         rte_exit(EXIT_FAILURE, "Invalid EAL parameters\n");
     argc -= ret;
     argv += ret;
-
     /* parse application arguments (after the EAL ones) */
     ret = parse_args(argc, argv);
     if (ret < 0)
@@ -2856,6 +2858,7 @@ main(int argc, char **argv)
 
     //check_all_ports_link_status((uint8_t)nb_ports, enabled_port_mask);
 
+    show_stat_init(); 
     tc_flow_ip_init();
     
     mem_cache_pool_create();
@@ -2891,7 +2894,6 @@ main(int argc, char **argv)
     signal(SIGUSR1, SigUsr1Handler);    if(errno!=0) errno=0;
                                     
     start_reload_timer();
-    show_stat_init(); 
     /* launch per-lcore init on every lcore */
     rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
     RTE_LCORE_FOREACH_SLAVE(lcore_id) {
