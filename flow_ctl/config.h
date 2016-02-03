@@ -29,7 +29,8 @@
 #define DPI_DISABLE 0
 #define DPI_ENABLE 1
 
-#define MAX_PKT_NUM 7
-
+#define MAX_PKT_NUM 8
+#define HTTP_MAX_PKT_NUM (MAX_PKT_NUM + 3)
+#define COMMON_MAX_PKT_NUM  (MAX_PKT_NUM + 15)
 #define APP_CLASS_ID_NOT_DEFINED (-1)
 #endif

@@ -326,7 +326,6 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
     //    l2ct_var_dpi * lvd =  ssv->ssn->vars[L2CT_VAR_DPI];
     if ((proto_mark = ftp_lookup_behavior(ssv->sip, ssv->dip, ssv->dport))) {
 	 update_proto_mark(ssv,proto_mark,0);
-        ssv->ssn->proto_mark_finish = 1;
         return 1;
     }
 #if 0
@@ -348,17 +347,15 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
 
     if ((proto_mark = study_lookup_behavior(ssv->sip, ssv->sport))) {
 	 update_proto_mark(ssv,proto_mark,0);
-        ssv->ssn->proto_mark_finish = 1;
 #ifdef DYNAMIC_DEBUG
-        D("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
+        LOG("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
 #endif
         return 1;
     }
     if ((proto_mark = study_lookup_behavior(ssv->dip, ssv->dport))) {
         update_proto_mark(ssv,proto_mark,0);
-        ssv->ssn->proto_mark_finish = 1;
 #ifdef DYNAMIC_DEBUG
-        D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
+        LOG("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
 #endif
         return 1;
     }  
@@ -367,7 +364,6 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
 
     if ((proto_mark = study_lookup_behavior(ssv->server_ip, 0))) {
         ssv->ssn->proto_mark = proto_mark;
-        ssv->ssn->proto_mark_finish = 1;
         //D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
         return 1;
     }
@@ -398,9 +394,8 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
 
         if ((proto_mark = study_lookup_behavior(ssv->dip, 0))) {
             update_proto_mark(ssv,proto_mark,0);
-            ssv->ssn->proto_mark_finish = 1;
 #ifdef DYNAMIC_DEBUG
-            D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
+            LOG("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
 #endif
             return 1;
         }
@@ -413,7 +408,7 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
             }
             update_proto_mark(ssv,proto_mark,0);
 #ifdef DYNAMIC_DEBUG
-            D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
+            LOG("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
 #endif
             return 1;
         } 
@@ -425,7 +420,7 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
             }
             update_proto_mark(ssv,proto_mark,0);
 #ifdef DYNAMIC_DEBUG
-            D("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
+            LOG("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
 #endif
             return 1;
         }
@@ -434,9 +429,8 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
 
         if ((proto_mark = study_lookup_behavior(ssv->sip, 0))) {
             update_proto_mark(ssv,proto_mark,0);
-            ssv->ssn->proto_mark_finish = 1;
 #ifdef DYNAMIC_DEBUG
-            D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
+            LOG("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to study cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport),IPQUADS(ssv->dip), ntohs(ssv->dport), proto_mark, ssv->isinner);
 #endif
             return 1;
         }
@@ -449,7 +443,7 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
             }
            update_proto_mark(ssv,proto_mark,0);
 #ifdef DYNAMIC_DEBUG
-            D("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
+            LOG("dest [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
 #endif
             return 1;
         } 
@@ -461,7 +455,7 @@ static inline int do_dynamic_proto_work(struct ssn_skb_values *ssv)
             }
            update_proto_mark(ssv,proto_mark,0);
 #ifdef DYNAMIC_DEBUG
-            D("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
+            LOG("source [%u.%u.%u.%u:%u]->[%u.%u.%u.%u:%u]proto[%x]to dynamic cache  isinner[%d]\n", IPQUADS(ssv->sip), ntohs(ssv->sport), IPQUADS(ssv->dip), ntohs(ssv->dport),proto_mark, ssv->isinner);
 #endif
             return 1;
         }
@@ -667,7 +661,8 @@ static inline int judge_http(char * payload, struct sft_fdb_entry * ssn, struct 
         {
             if(ssn->proto_mark == 0)
             {
-                update_proto_mark(ssv,pv.http_proto_appid,0);
+                update_proto_mark(ssv, pv.http_proto_appid,0);
+                ssn->max_pkt_cnt = HTTP_MAX_PKT_NUM;
             }
             return 1;
         }
@@ -679,6 +674,7 @@ static inline int judge_http(char * payload, struct sft_fdb_entry * ssn, struct 
              if(ssn->proto_mark == 0)
              {
                 update_proto_mark(ssv,pv.http_proto_appid,0);
+                ssn->max_pkt_cnt = HTTP_MAX_PKT_NUM;
              }
   
             return 1;
@@ -1046,52 +1042,173 @@ static inline void amend_unknown_stream_for_others(struct ssn_skb_values *ssv)
     return;
 }
 #endif
+
+#if 1
+/* ---  "Original" uTP Header ("version 0" ?) --------------
+
+See utp.cpp source code @ https://github.com/bittorrent/libutp
+
+-- Fixed Header --
+0       4       8               16              24              32
++-------+-------+---------------+---------------+---------------+
+| connection_id                                                 |
++-------+-------+---------------+---------------+---------------+
+| timestamp_seconds                                             |
++---------------+---------------+---------------+---------------+
+| timestamp_microseconds                                        |
++---------------+---------------+---------------+---------------+
+| timestamp_difference_microseconds                             |
++---------------+---------------+---------------+---------------+
+| wnd_size      | ext           | flags         | seq_nr [ho]   |
++---------------+---------------+---------------+---------------+
+| seq_nr [lo]   | ack_nr                        |
++---------------+---------------+---------------+
+
+-- Extension Field(s) --
+0               8               16
++---------------+---------------+---------------+---------------+
+| extension     | len           | bitmask
++---------------+---------------+---------------+---------------+
+                                |
++---------------+---------------+....
+
+*/
+
+/* --- Version 1 Header ----------------
+
+Specifications: BEP-0029
+http://www.bittorrent.org/beps/bep_0029.html
+
+-- Fixed Header --
+Fields Types
+0       4       8               16              24              32
++-------+-------+---------------+---------------+---------------+
+| type  | ver   | extension     | connection_id                 |
++-------+-------+---------------+---------------+---------------+
+| timestamp_microseconds                                        |
++---------------+---------------+---------------+---------------+
+| timestamp_difference_microseconds                             |
++---------------+---------------+---------------+---------------+
+| wnd_size                                                      |
++---------------+---------------+---------------+---------------+
+| seq_nr                        | ack_nr                        |
++---------------+---------------+---------------+---------------+
+
+-- Extension Field(s) --
+0               8               16
++---------------+---------------+---------------+---------------+
+| extension     | len           | bitmask
++---------------+---------------+---------------+---------------+
+                                |
++---------------+---------------+....
+*/
+static inline void enhance_encrypt_stream_for_bt(struct ssn_skb_values *ssv)
+{
+    if((ntohs(ssv->sport) < 1024) || (ntohs(ssv->dport) < 1024) || ssv->payload_len < 23 /* min header size */ )
+    {
+        return;
+    }
+
+    /*
+    Check for uTP http://www.bittorrent.org/beps/bep_0029.html
+
+    wireshark/epan/dissectors/packet-bt-utp.c
+    */
+     //way1
+    const char *bt_search = "BT-SEARCH * HTTP/1.1\r\n";
+    if(strncmp((const char*)ssv->payload, bt_search, strlen(bt_search)) == 0) 
+    {
+        update_proto_mark(ssv, pv.enhance_encrypt_bt, 0);
+        return;
+    }
+
+    
+    //way2
+    if((ssv->payload[0]== 0x60)
+    && (ssv->payload[1]== 0x0)
+    && (ssv->payload[2]== 0x0)
+    && (ssv->payload[3]== 0x0)
+    && (ssv->payload[4]== 0x0)) 
+    {
+        update_proto_mark(ssv, pv.enhance_encrypt_bt, 0);
+        return;
+    }
+
+     //way3
+    /* Check if this is protocol v1 */
+    uint8_t v1_version     = ssv->payload[0];
+    uint8_t v1_extension   = ssv->payload[1];
+    uint32_t v1_window_size = *((uint32_t*)&ssv->payload[12]);
+    if(((v1_version & 0x0f) == 1)
+    && ((v1_version >> 4) < 5 /* ST_NUM_STATES */)
+    && (v1_extension      < 3 /* EXT_NUM_EXT */)
+    && (v1_window_size    < 32768 /* 32k */)
+    ) 
+    {
+        update_proto_mark(ssv, pv.enhance_encrypt_bt, 0);
+        return;
+    } 
+
+    //way4
+    /* Check if this is protocol v0 */
+    uint8_t v0_extension = ssv->payload[17];
+    uint8_t v0_flags     = ssv->payload[18];
+    if((v0_flags < 6 /* ST_NUM_STATES */) && (v0_extension < 3 /* EXT_NUM_EXT */)) 
+    {
+        uint32_t ts = ntohl(*((uint32_t*)&(ssv->payload[4])));
+        uint32_t now;
+
+        now = (uint32_t)time(NULL);
+
+        if((ts < (now+86400)) && (ts > (now-86400))) 
+        {
+            update_proto_mark(ssv, pv.enhance_encrypt_bt, 0);
+            return;
+        }
+     }
+
+    return;
+}
+#endif
 static int max_pkt_cnt = MAX_PKT_NUM;
 int do_dpi_entry(struct rte_mbuf *skb, unsigned portid, unsigned lcore_id)
 {
     int acsmflag = 0;
-    //if(m == NULL) return 1;
-    if(unlikely(pv.dpi_ctrl != DPI_ENABLE )) 
+    if(unlikely(pv.dpi_ctrl != DPI_ENABLE)) 
         goto do_dpi_entry_end;
-    
+   
     if(!test_bit(0, &skb->vars))
         goto do_dpi_entry_end;
-    
-    //    if(statictics_flag == 0) return 1;
+  
     struct sft_fdb_entry * ssn = (struct sft_fdb_entry *)skb->l2ct;
     if(unlikely(ssn == NULL)) 
         goto do_dpi_entry_end;
-#if 0
-    if(ssn->proto_mark == pv.tcp_application_mutual ||
-        ssn->proto_mark == pv.tcp_video_download ||
-        ssn->proto_mark == pv.udp_application_mutual ||
-        ssn->proto_mark == pv.udp_video_download ||
-        ssn->proto_mark == pv.unknown_80_appid)
-    {
-        goto do_dpi_entry_end;
-    }
-#endif  
-
-    if ((ssn->proto_mark ^ ssn->init_proto_mark) && (ssn->proto_mark & 0x3) == 0x01) {
-        goto do_dpi_entry_end;
-    }
 
     if(ssn->magic != 'X') 
         goto do_dpi_entry_end;
 
+    if ((ssn->proto_mark &0x3) == 0x1) {
+        goto do_dpi_entry_end;
+    }
     struct ssn_skb_values ssv; 
 
     bzero(&ssv,sizeof(struct ssn_skb_values));
     ssv.http_token_method = HTTP_TOCKE_INVALID;
-    //memset(ssv->ssn->place_token_list,-1,sizeof(ssv->ssn->place_token_list));
 
     ssv.ssn = ssn;
    
     if(decode_skb(skb, &ssv) < 0)
         goto do_dpi_entry_end;
-    
-    //if((ssn->proto_mark & 0x3) == 0 && do_tuple_dpi_work(&ssv) == 1)//:1:already identificatied
-    if(!(ssn->proto_mark ^ ssn->init_proto_mark) && do_tuple_dpi_work(&ssv) == 1)//:1:already identificatied
+    if (ssn->pkt_cnt >= ssn->max_pkt_cnt && ssv.sport != 0x3500 && (ssn->proto_mark&0x3) != 0x3) {
+        //reidentify unknow for  others:
+        //unknown_80_appid, udp_application_mutual, udp_video_download,tcp_application_mutual,tcp_video_download
+        if (!ssn->proto_mark) {
+            amend_unknown_stream_for_others(&ssv);
+        }
+        goto do_dpi_entry_end;
+    }
+
+    if(do_tuple_dpi_work(&ssv) == 1 && (ssn->proto_mark&0x3) == 0x1)//:1:already identificatied
     {
         goto do_dpi_entry_end;
     } 
@@ -1103,37 +1220,12 @@ int do_dpi_entry(struct rte_mbuf *skb, unsigned portid, unsigned lcore_id)
 
     ssn->pkt_cnt ++;
 
-//    printf("ssv.l4proto=%u\n", ssv.l4proto); 
     if(IPPROTO_TCP == ssv.l4proto && ssv.ssn->is_http == 0) 
     {
         ssv.ssn->is_http = judge_http(ssv.payload, ssn,&ssv);
-        //if (ssv.ssn->is_http) 
-       //     ssv.ssn->proto_mark |= 0x1; 
     }
-
-    //if (ssn->proto_mark & 0x3) {
-    //     max_pkt_cnt = (MAX_PKT_NUM + 60);
-    //} else 
-    if(ssv.ssn->is_http)
-    {
-        max_pkt_cnt = (MAX_PKT_NUM + 3);
-    }
-    else 
-    {
-        max_pkt_cnt = (MAX_PKT_NUM + 15);
-    }
-#if 0
-    if (substr_in_mainstr_nocase(ssv.payload, ssv.payload_len, "/commit/post/add", 0) > 0) {
-        printf("[%u.%u.%u.%u:%u->%u.%u.%u.%u:%u][%d]\n",IPQUADS(ssv.sip), ssv.sport, IPQUADS(ssv.dip), ssv.dport, ssn->pkt_cnt);
-        int aaaaaaa=0;
-    }
-#endif
-    if(ssv.sport == 0x3500||ssn->pkt_cnt <= max_pkt_cnt||(ssn->proto_mark & 0x3) == 0x3)
-    {
-        dpi_acsm_search(&ssv);
-        acsmflag = 1;
-    }
-
+    dpi_acsm_search(&ssv);
+    acsmflag = 1;
 
     //study the ftp
     if(pv.ftp_proto_appid == ssn->proto_mark)
@@ -1141,24 +1233,21 @@ int do_dpi_entry(struct rte_mbuf *skb, unsigned portid, unsigned lcore_id)
         detect_ftp_proto(&ssv);
     }
 
-
     //fixed length dpi 
     if (!(ssn->proto_mark))
     {
         identify_fixed_length_packet(&ssv);
     }
 
-#if 1
-    //reidentify unknow for  others:
-    //unknown_80_appid, udp_application_mutual, udp_video_download,tcp_application_mutual,tcp_video_download
-    if (!(ssn->proto_mark) && ssn->pkt_cnt >= max_pkt_cnt)
+#if 0
+    if(0==ssn->proto_mark && IPPROTO_UDP == ssv.l4proto)
     {
-        amend_unknown_stream_for_others(&ssv);
+        enhance_encrypt_stream_for_bt(&ssv);
     }
-#endif    
+#endif
+
     export_log(&ssv, ssn, acsmflag ,lcore_id);
 
     do_dpi_entry_end:
         return 1;
 }
-

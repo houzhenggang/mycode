@@ -1,6 +1,10 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
-#include "com.h"
+#include <sys/types.h>
+#include <stdint.h>
+#include <unistd.h>
+
+#define offsetof(type, field) ((size_t) &( ((type *)0)->field) )
 /*
  * Architectures might want to move the poison pointer offset
  * into some well-recognized area such as 0xdead000000000000,
@@ -777,31 +781,5 @@ static inline void hlist_move_list(struct hlist_head *old,
 	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
 	     pos && ({ n = pos->member.next; 1; });			\
 	     pos = hlist_entry_safe(n, typeof(*pos), member))
-typedef struct listelmt_ {
-    void               *data;
-    struct listelmt_   *next;
-
-} listelmt;
-typedef struct list_s {
-    int                size;
-    int                (*match)(const void *key1, const void *key2);
-    void               (*destroy)(void *data);
-    void*              (*alloc)(int size);
-    listelmt           *head;
-    listelmt           *tail;
-} list_t;
-
-void list_init(list_t *list, void (*destroy)(void *data), void *(*alloc)(int size));
-void list_destroy(list_t *list);
-int list_ins_next(list_t *list, listelmt *element, const void *data);
-int list_rem_next(list_t *list, listelmt *element, void **data);
-
-#define list_size(list) ((list)->size)
-#define list_head(list) ((list)->head)
-#define list_tail(list) ((list)->tail)
-#define list_is_head(list, element) ((element) == (list)->head ? 1 : 0)
-#define list_is_tail(element) ((element)->next == NULL ? 1 : 0)
-#define list_data(element) ((element)->data)
-#define list_next(element) ((element)->next)
 
 #endif

@@ -202,18 +202,21 @@ int sft_do_statistics_flow_work(struct rte_mbuf *skb)
         prev_sub_type = (ssn->prev_proto_mark & SUB_TYPE_MASK) >> 16;
     }
     uint64_t current_time = rte_rdtsc();
+    int64_t link;
 
-if (!isinner_by_portid(skb->in_port))
+    if (!isinner_by_portid(skb->in_port))
     {//downlink
         if (update_flow)
-            rte_atomic64_add( &DPI_Statistics[big_type][mid_type][sub_type].down, (uint64_t)rte_pktmbuf_pkt_len(skb));
+            rte_atomic64_add( &DPI_Statistics[big_type][mid_type][sub_type].down, (uint32_t)rte_pktmbuf_pkt_len(skb));
         if (ssn && (ssn->proto_mark ^ ssn->prev_proto_mark || current_time - ssn->link_timestamp >= 5 * pv.hz )) {
-           
-            rte_atomic64_inc(&DPI_Statistics[big_type][mid_type][sub_type].link);
 
+            rte_atomic64_inc(&DPI_Statistics[big_type][mid_type][sub_type].link);
+            
             if (ssn->proto_mark ^ ssn->prev_proto_mark) {
                 ssn->prev_proto_mark = ssn->proto_mark;
-                rte_atomic64_dec(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
+                link = rte_atomic64_read(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
+                if (link > 0)
+                    rte_atomic64_dec(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
             } else {
                 ssn->link_timestamp = current_time;
             }
@@ -226,7 +229,7 @@ if (!isinner_by_portid(skb->in_port))
         if(sub_type != 255)
         {
             if (update_flow)
-                rte_atomic64_add(&DPI_Statistics[big_type][mid_type][255].down, (uint64_t)rte_pktmbuf_pkt_len(skb));
+                rte_atomic64_add(&DPI_Statistics[big_type][mid_type][255].down, (uint32_t)rte_pktmbuf_pkt_len(skb));
             if (update_link == 1) {
                 rte_atomic64_inc( &DPI_Statistics[big_type][mid_type][255].link);
             }
@@ -237,7 +240,7 @@ if (!isinner_by_portid(skb->in_port))
             if(sub_type != 255)
             {
                 if (update_flow)
-                    rte_atomic64_add(&DPI_Statistics[big_type][15][255].down, (uint64_t)rte_pktmbuf_pkt_len(skb)); 
+                    rte_atomic64_add(&DPI_Statistics[big_type][15][255].down, (uint32_t)rte_pktmbuf_pkt_len(skb)); 
                 if (update_link == 1) {
                     rte_atomic64_inc( &DPI_Statistics[big_type][15][255].link);
                 }
@@ -246,7 +249,7 @@ if (!isinner_by_portid(skb->in_port))
         else
         {
             if (update_flow)
-                rte_atomic64_add( &DPI_Statistics[big_type][15][255].down, (uint64_t)rte_pktmbuf_pkt_len(skb));
+                rte_atomic64_add( &DPI_Statistics[big_type][15][255].down, (uint32_t)rte_pktmbuf_pkt_len(skb));
             if (update_link == 1) {
                 rte_atomic64_inc( &DPI_Statistics[big_type][15][255].link);
             }
@@ -256,14 +259,16 @@ if (!isinner_by_portid(skb->in_port))
 	{//uplink
 
         if (update_flow)
-            rte_atomic64_add(&DPI_Statistics[big_type][mid_type][sub_type].up,(uint64_t)rte_pktmbuf_pkt_len(skb));
+            rte_atomic64_add(&DPI_Statistics[big_type][mid_type][sub_type].up,(uint32_t)rte_pktmbuf_pkt_len(skb));
         if (ssn && (ssn->proto_mark ^ ssn->prev_proto_mark || current_time - ssn->link_timestamp >= 5 * pv.hz )) {
            
             rte_atomic64_inc(&DPI_Statistics[big_type][mid_type][sub_type].link);
 
-            if (ssn->proto_mark ^ ssn->prev_proto_mark) {
+            if (ssn->proto_mark ^ ssn->prev_proto_mark && link > 0) {
                 ssn->prev_proto_mark = ssn->proto_mark;
-                rte_atomic64_dec(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
+                link = rte_atomic64_read(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
+                if (link >0)
+                    rte_atomic64_dec(&DPI_Statistics[prev_big_type][prev_mid_type][prev_sub_type].link);
             } else {
                 ssn->link_timestamp = current_time;
             }
@@ -276,7 +281,7 @@ if (!isinner_by_portid(skb->in_port))
         if(sub_type != 255)
 		{
             if (update_flow)
-			    rte_atomic64_add(&DPI_Statistics[big_type][mid_type][255].up, (uint64_t)rte_pktmbuf_pkt_len(skb));
+			    rte_atomic64_add(&DPI_Statistics[big_type][mid_type][255].up, (uint32_t)rte_pktmbuf_pkt_len(skb));
             if (update_link == 1) {
                 rte_atomic64_inc( &DPI_Statistics[big_type][mid_type][255].link);
             }
@@ -286,7 +291,7 @@ if (!isinner_by_portid(skb->in_port))
 			if(sub_type != 255)
 			{
                 if (update_flow)
-				    rte_atomic64_add(&DPI_Statistics[big_type][15][255].up, (uint64_t)rte_pktmbuf_pkt_len(skb));
+				    rte_atomic64_add(&DPI_Statistics[big_type][15][255].up, (uint32_t)rte_pktmbuf_pkt_len(skb));
                 if (update_link == 1) {
                     rte_atomic64_inc( &DPI_Statistics[big_type][15][255].link);
                 }
@@ -295,7 +300,7 @@ if (!isinner_by_portid(skb->in_port))
 		else
 		{
             if (update_flow)
-                rte_atomic64_add(&DPI_Statistics[big_type][15][255].up, (uint64_t)rte_pktmbuf_pkt_len(skb));
+                rte_atomic64_add(&DPI_Statistics[big_type][15][255].up, (uint32_t)rte_pktmbuf_pkt_len(skb));
             if (update_link == 1) {
                 rte_atomic64_inc( &DPI_Statistics[big_type][15][255].link);
             }
@@ -316,12 +321,11 @@ timer0_cb(__attribute__((unused)) struct rte_timer *tim,
 {
     static unsigned counter = 0;
     int i, j, k;
-    uint64_t up,down, link, total_link;
+    int64_t up,down, link, total_link;
     char export_buf[256]; 
     int flag = 0;
     int n = 0;
     static_buf[0] = '\0';
-//    uint64_t other_link = rte_atomic64_read(&pv.all_link);
 
     for (i = 1; i < 16; i++) { 
         for (j = 15; j > 0; j--) {
@@ -331,30 +335,29 @@ timer0_cb(__attribute__((unused)) struct rte_timer *tim,
                     down = rte_atomic64_read(&DPI_Statistics[i][j][k].down);
                     link = rte_atomic64_read(&DPI_Statistics[i][j][k].link);
 //                    printf("[%u][%u][%u]=%u\n",i,j,k,link);
-                    rte_atomic64_set(&DPI_Statistics[i][j][k].link, 0);
-                    total_link = rte_atomic64_add_return(&DPI_Statistics[i][j][k].total_link,link);
-                    if (up||down||total_link)
-                    {
-                        //      bzero(export_buf,256);
-                        //      sprintf( export_buf, "%s|%ld/%ld\n",DPI_Statistics[i][j][k].name, up, down);
-                        //      printf("%s", export_buf);
-                        n += snprintf(static_buf+n, 256, "%s|%lu/%lu/%lu\n",DPI_Statistics[i][j][k].name, up, down, total_link);
-                        //export_file(STATICTICS_FILE_TYPE, static_buf,flag);
-                        //flag = 1;
-                    }
+                    //rte_atomic64_set(&DPI_Statistics[i][j][k].link, 0);
+                    rte_atomic64_clear(&DPI_Statistics[i][j][k].link);
+                        total_link = rte_atomic64_add_return(&DPI_Statistics[i][j][k].total_link,link);
+                        if (up > 0||down > 0||(total_link > 0 && !((pv.syn_ack &0xffff0000) ^ (i<<28|j<<24|k<<16))))
+                        {
+                            //      bzero(export_buf,256);
+                            //      sprintf( export_buf, "%s|%ld/%ld\n",DPI_Statistics[i][j][k].name, up, down);
+                            //      printf("%s", export_buf);
+                            n += snprintf(static_buf+n, 256, "%s|%lu/%lu/%lu\n",DPI_Statistics[i][j][k].name, up, down, total_link);
+                            //export_file(STATICTICS_FILE_TYPE, static_buf,flag);
+                            //flag = 1;
+                        }
                 }
             }
         }
     }
 
-#if 1
             link = rte_atomic64_read(&DPI_Statistics[0][0][0].link);
-            rte_atomic64_set(&DPI_Statistics[0][0][0].link, 0);
-            total_link = rte_atomic64_add_return(&DPI_Statistics[0][0][0].total_link, link);
-            n += snprintf(static_buf+n, 256, "%s|%lu/%lu/%lu\n",
-            DPI_Statistics[0][0][0].name, rte_atomic64_read(&DPI_Statistics[0][0][0].up), rte_atomic64_read(&DPI_Statistics[0][0][0].down), total_link);
-#endif
-            export_file(STATICTICS_FILE_TYPE, static_buf,3);
+            rte_atomic64_clear(&DPI_Statistics[0][0][0].link);
+                total_link = rte_atomic64_add_return(&DPI_Statistics[0][0][0].total_link, link);
+                n += snprintf(static_buf+n, 256, "%s|%lu/%lu/%lu\n",
+                        DPI_Statistics[0][0][0].name, rte_atomic64_read(&DPI_Statistics[0][0][0].up), rte_atomic64_read(&DPI_Statistics[0][0][0].down), total_link);
+                export_file(STATICTICS_FILE_TYPE, static_buf,3);
            // export_file(STATICTICS_FILE_TYPE, NULL, 2);
            
     output_rule_flow_statics();
@@ -379,6 +382,7 @@ int init_dpi_statistics(void)
         exit(1);
         return -1;
     }
+    
     init_app_stat();
     init_export_file();
     statictics_flag = 1;

@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "debug.h"
 #include "com.h"
+#include "stat.h"
 
 static uint32_t g_hash_initval;
 #define STUDY_RELOAD_TEST	
@@ -56,6 +57,7 @@ static void study_cache_release_fn(struct h_scalar *he)
 	struct study_cache *sc = container_of(he, struct study_cache, h_scalar);
     //LOG("free study cache[%p]\n", sc);
 //    printf("[%p]end time:%u\n",sc, time(NULL));
+    skb_stat->study_hash_count--;
     rte_mempool_mp_put(study_cache_tbl.mem_cache, sc);
 }
 
@@ -92,6 +94,7 @@ static struct h_scalar *study_cache_create_fn(struct h_table *ht, void *key)
     sc->port = k->port;
     sc->proto_mark = k->proto_mark;
     sc->lcore_id = lcore_id;
+    skb_stat->study_hash_count ++;
 //    printf("[%p]start time:%u\n",sc, time(NULL));
 //	rte_spinlock_init(&sc->lock);
 	return &sc->h_scalar;
@@ -198,6 +201,7 @@ int study_cache_init(void)
 		goto err_study_create;
     }
 	
+    skb_stat->study_hash_count = 0;
 	return 0;
 
 	

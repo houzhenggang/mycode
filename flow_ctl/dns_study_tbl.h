@@ -22,12 +22,12 @@
     
 
 
-#define DNS_STUDY_HASH_SIZE    (1 << 11)
+#define DNS_STUDY_HASH_SIZE    (1 << 10)
 #define DNS_STUDY_MAX_LEN      (DNS_STUDY_HASH_SIZE * 4)
 #define DNS_STUDY_TIMEOUT      (1200)
 #define DNS_STUDY_OUTPUT_INTERVAL    (300)
     
-#define DNS_STUDY__RULE_RECHECK_TIMEOUT  10
+#define DNS_STUDY_RULE_RECHECK_TIMEOUT  10
 
 struct dns_study_cache
 {
@@ -38,7 +38,7 @@ struct dns_study_cache
     __u32       ip;
     __u16       port;
     uint8_t lcore_id;
-    rte_spinlock_t lock;
+//    rte_spinlock_t lock;
 };
 //struct dns_study_cache *dns_study_cache_try_get(const __u32 ip, const __u16 port, unsigned int proto_mark);
 int dns_study_cache_try_get(const __u32 ip, const __u16 port, unsigned int proto_mark);

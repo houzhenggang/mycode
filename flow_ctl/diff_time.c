@@ -33,6 +33,10 @@ typedef struct {
     uint64_t cache_pkg_num;
     uint64_t failed_recv_pkg[8];
     int web_msgid;
+    uint32_t study_hash_count;
+    uint32_t dns_hash_count;
+    uint32_t dynamic_hash_count;
+    uint32_t exceed_ac_state[8];
 }skbstat_t;
 
 int __ch_isspace(char c)
@@ -157,15 +161,15 @@ int main(int argc, char **argv)
                 }
                 if (output_flag) {
                     time (&timep);
-                printf("%score_%u avg-time: %6u ns, max-time: %6uns, pkg(s) :%8u  time(s):%10u high-water(%u) %5u, free-skb %10u, htimes:%5u, high-hwater:%5u, num-FIP:%5u,rte-timer(s):%10u,send-pkt(s):%10u,web-msg:%5d, cache-pkg:%5u, fail-recv-pkg:%5u\n", 
+                printf("%score_%u avg-time: %6u ns, max-time: %6uns, pkg(s) :%8u  time(s):%10u high-water(%u) %5u, free-skb %10u, htimes:%5u, high-hwater:%5u, num-FIP:%5u,rte-timer(s):%10u,send-pkt(s):%10u,web-msg:%5d, cache-pkg:%5u, fail-recv-pkg:%5u, study-cnt:%5u,dynamic-cnt:%5u,dns-cnt:%u, exceed-ac-state:%u\n", 
                         asctime(gmtime(&timep)), i, skbstat->total_tsc[i]/(2*(skbstat->total_num[i])), skbstat->max_arg_diff_tsc[i]/2,
                          skbstat->total_num[i]/5, skbstat->total_tsc[i]/(5*2), high_water_mark, skbstat->exceed_high_water_mark_count, skbstat->fail_skb,
-                         skbstat->max_hash_level, skbstat->exceed_hash_level_count, skbstat->nums_sft_fip_entry,skbstat->rte_timer_tsc_per_sec[i] / 2, skbstat->send_pkt_tsc_per_sec[i]/2, skbstat->web_mesg_flag, skbstat->cache_pkg_num, skbstat->failed_recv_pkg[i]);
+                         skbstat->max_hash_level, skbstat->exceed_hash_level_count, skbstat->nums_sft_fip_entry,skbstat->rte_timer_tsc_per_sec[i] / 2, skbstat->send_pkt_tsc_per_sec[i]/2, skbstat->web_mesg_flag, skbstat->cache_pkg_num, skbstat->failed_recv_pkg[i], skbstat->study_hash_count, skbstat->dynamic_hash_count,skbstat->dns_hash_count, skbstat->exceed_ac_state[i]);
                 } else {
-                sprintf(buf, "core_%u avg-time: %6u ns, max-time: %6uns, pkg(s) :%8u  time(s):%10u high-water(%u) %5u, free-skb %10u, htimes:%5u, high-hwater:%5u, num-FIP:%5u,rte-timer(s):%10u,send-pkt(s):%10u,web-msg:%5d, cache-pkg:%5u, fail-recv-pkg:%5u\n", 
+                sprintf(buf, "core_%u avg-time: %6u ns, max-time: %6uns, pkg(s) :%8u  time(s):%10u high-water(%u) %5u, free-skb %10u, htimes:%5u, high-hwater:%5u, num-FIP:%5u,rte-timer(s):%10u,send-pkt(s):%10u,web-msg:%5d, cache-pkg:%5u, fail-recv-pkg:%5u,study-cnt:%5u,dynamic-cnt:%5u,dns-cnt:%u,exceed-ac-state:%u\n", 
                          i, skbstat->total_tsc[i]/(2*(skbstat->total_num[i])), skbstat->max_arg_diff_tsc[i]/2, 
                         skbstat->total_num[i]/5, skbstat->total_tsc[i]/(5*2), high_water_mark, skbstat->exceed_high_water_mark_count, skbstat->fail_skb, 
-                        skbstat->max_hash_level, skbstat->exceed_hash_level_count, skbstat->nums_sft_fip_entry,skbstat->rte_timer_tsc_per_sec[i] / 2, skbstat->send_pkt_tsc_per_sec[i]/2, skbstat->web_mesg_flag, skbstat->cache_pkg_num, skbstat->failed_recv_pkg[i]);
+                        skbstat->max_hash_level, skbstat->exceed_hash_level_count, skbstat->nums_sft_fip_entry,skbstat->rte_timer_tsc_per_sec[i] / 2, skbstat->send_pkt_tsc_per_sec[i]/2, skbstat->web_mesg_flag, skbstat->cache_pkg_num, skbstat->failed_recv_pkg[i], skbstat->dynamic_hash_count,skbstat->dns_hash_count,skbstat->exceed_ac_state[i]);
                     write_log(buf);
                 }
             }

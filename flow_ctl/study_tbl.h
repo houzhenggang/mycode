@@ -22,7 +22,7 @@
     
 
 
-#define STUDY_HASH_SIZE    (1 << 16)
+#define STUDY_HASH_SIZE    (1 << 18)
 #define STUDY_MAX_LEN      (STUDY_HASH_SIZE * 8)
 #define STUDY_TIMEOUT      (120)
 #define STUDY_OUTPUT_INTERVAL    (300)

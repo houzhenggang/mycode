@@ -180,6 +180,7 @@ static void init_pv()
         exit(1);
     }
 #endif
+#if 0
     for (i = 0; i < rte_lcore_count(); i++) {
         
         pv.hash_do_queue[i] = kfifo_alloc(HASH_QUEUE_SIZE, NULL);
@@ -191,6 +192,8 @@ static void init_pv()
         rte_timer_reset(&pv.queue_timer[i], 1*pv.hz, PERIODICAL, i,
                 queue_timer_func, NULL);
     }
+#endif
+
 #if 0
     INIT_LIST_HEAD(&pv.dip_conf.app_class_file_head);
     INIT_LIST_HEAD(&pv.dip_conf.place_file_head);

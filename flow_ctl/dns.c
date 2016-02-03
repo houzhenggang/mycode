@@ -22,6 +22,7 @@
 #include "dpi.h"
 #include "session_mgr.h"
 
+//#define DNS_LOG_TEST	
 #define DNS_STUDY_TIMEO (3600 * 24)
 
 static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
@@ -169,10 +170,14 @@ void parse_dns(void *data, pattern_t *pattern, size_t offset)
                                     } else {
                                         dynamic_cache_try_get(*((u_int32_t*)&ssv->payload[i]), pattern->pattern_key.dynamic_port, (ssv->ssn->proto_mark|0x8000), 0); 
                                     }
-                                       //LOG("dns proto_mark=%u ip:[%u]%u.%u.%u.%u:%u\n",ssv->ssn->proto_mark, v,IPQUADS(v), ntohs(pattern->pattern_key.dynamic_port));
+#ifdef DNS_LOG_TEST
+                                       LOG("dns proto_mark=%u ip:[%u]%u.%u.%u.%u:%u\n",ssv->ssn->proto_mark, v,IPQUADS(v), ntohs(pattern->pattern_key.dynamic_port));
+#endif
                                 } else {
                                         dns_study_cache_try_get(*((u_int32_t*)&ssv->payload[i]), pattern->pattern_key.dynamic_port, (ssv->ssn->proto_mark|0x8000)); 
-                                       //LOG("dns proto_mark=%u ip:[%u]%u.%u.%u.%u:%u\n",ssv->ssn->proto_mark, v,IPQUADS(v), ntohs(pattern->pattern_key.dynamic_port));
+#ifdef DNS_LOG_TEST
+                                       LOG("dns proto_mark=%u ip:[%u]%u.%u.%u.%u:%u\n",ssv->ssn->proto_mark, v,IPQUADS(v), ntohs(pattern->pattern_key.dynamic_port));
+#endif
                                        // D("add to dns study cache\n");
                                 }
 

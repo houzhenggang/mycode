@@ -643,7 +643,7 @@ int do_parse_rule_work(struct tc_private_t *conf, char *rule_string)
                                     RTE_ERR("%s(%d), datapipe[%d] timer reset failde.\n", __FUNCTION__, __LINE__, idx);
                                 }
                                 RTE_DBG("%s(%d),start datapipeID:%d timer.\n",__FUNCTION__,__LINE__,idx);
-
+                                
                                 conf->ksft_datapipe[idx].index = rule->index;
                             }
                             conf->ksft_datapipe[idx].used = 1;

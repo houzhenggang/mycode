@@ -14,6 +14,7 @@
 #include "session_mgr.h"
 
 
+#define DYNAMIC_TIMEO (3600 * 24)
 #define DNS_STUDY_TIMEO (3600 * 24)
 //#define DYNAMIC_DEBUG
 
@@ -68,13 +69,13 @@ void dynamic_parse(void *data, pattern_t *pattern, size_t offset)
                             {    
                                     if (pattern->pattern_key.dynamic_port == (uint16_t)-1) {
 
-                                        study_cache_try_get(ssv->ssn->sess_key.ip_dst, ssv->dport, ssv->ssn->proto_mark, 0, 0); 	
+                                        study_cache_try_get(ssv->ssn->sess_key.ip_dst, ssv->dport, ssv->ssn->proto_mark, 0, DYNAMIC_TIMEO); 	
  #ifdef DYNAMIC_DEBUG
                                     LOG("pattern[%s]add ip [%u]and port [%u.%u.%u.%u:%u] proto[%u] dynamic_indirect[%d]to study cache, common type, \n",
                                                     pattern->pattern_name, ssv->ssn->sess_key.ip_dst, IPQUADS(ssv->ssn->sess_key.ip_dst), ntohs(ssv->dport),  ssv->ssn->proto_mark,pattern->pattern_key.dynamic_indirect); 
 #endif
                                    } else {
-                                    study_cache_try_get(ssv->ssn->sess_key.ip_dst, pattern->pattern_key.dynamic_port, ssv->ssn->proto_mark, 0, 0); 	
+                                    study_cache_try_get(ssv->ssn->sess_key.ip_dst, pattern->pattern_key.dynamic_port, ssv->ssn->proto_mark, 0, DYNAMIC_TIMEO); 	
 #ifdef DYNAMIC_DEBUG
                                     LOG("pattern[%s]add ip [%u]and port [%u.%u.%u.%u:%u] proto[%u] dynamic_indirect[%d]to study cache, common type, \n",
                                                     pattern->pattern_name, ssv->ssn->sess_key.ip_dst, IPQUADS(ssv->ssn->sess_key.ip_dst), ntohs(pattern->pattern_key.dynamic_port),  ssv->ssn->proto_mark,pattern->pattern_key.dynamic_indirect); 

@@ -29,6 +29,7 @@
 #include "dpi_dynamic.h"
 #include "dpi_login_analysis.h"
 #include "shared_user_tbl.h"
+#include "stat.h"
 
 #define PATTERN_HASH_SIZE    (1 << 10)
 #define PATTERN_MAX_LEN      (PATTERN_HASH_SIZE * 4)
@@ -506,12 +507,9 @@ inline int check_pattern(pattern_t * pattern ,struct ssn_skb_values * ssv,int of
         return (ssv->payload_len ^ pattern->pattern_key.pkt_len_min);
     }
 #endif
-    if(pattern->pattern_key.pkt_len_max)
-    {
-        if((ssv->payload_len < pattern->pattern_key.pkt_len_min) || (ssv->payload_len > pattern->pattern_key.pkt_len_max))
-        {
-            return -1;
-        }
+    if ((pattern->pattern_key.pkt_len_max && ssv->payload_len > pattern->pattern_key.pkt_len_max) || 
+        (pattern->pattern_key.pkt_len_min && ssv->payload_len < pattern->pattern_key.pkt_len_min)) {
+        return -1;
     }
     
     return 0;
@@ -835,6 +833,7 @@ static inline int deal_search_key(void * _pattern, int offset, void * data, void
         cnt++;
         if(cnt >= MAX_SSN_STATE_NUM)
         {
+            skb_stat->exceed_ac_state[rte_lcore_id()] ++;            
             //            printf("%s(%d),error,id_list cnt:%d,maxlimit:%d pattern[%s].\n",__FUNCTION__,__LINE__,cnt,MAX_SSN_STATE_NUM, pattern->pattern_name);
             return -1;
         }

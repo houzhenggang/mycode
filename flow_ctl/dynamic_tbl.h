@@ -9,7 +9,7 @@
 
 #define DYNAMIC_HASH_SIZE    (1 << 12)
 #define DYNAMIC_MAX_LEN      (DYNAMIC_HASH_SIZE * 4)
-#define DYNAMIC_TIMEOUT      (120)
+#define DYNAMIC_TIMEOUT      (1200)
 #define DYNAMIC_OUTPUT_INTERVAL    (300)
     
 #define DYNAMIC_RULE_RECHECK_TIMEOUT  10

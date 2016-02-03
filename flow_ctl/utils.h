@@ -12,7 +12,8 @@
 #include <rte_ether.h>
 
 #include "com.h"
-
+#define jiffies ((rte_rdtsc() / rte_get_timer_hz()) * 1000)
+#define HZ_1S   1000
 #define swap_u32(a, b)  do { __u32 t = a; a = b; b = t; } while(0)
 #define swap___u16(a, b)  do { __u32 t = a; a = b; b = t; } while(0)
 

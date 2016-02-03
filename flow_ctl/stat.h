@@ -2,7 +2,6 @@
 #define _STAT_H
 #define STAT_SHM_KEY 0x99
 #include <rte_timer.h>
-
 typedef struct {
     uint64_t diff_tsc[8];
     uint64_t arg_diff_tsc[8];
@@ -22,6 +21,10 @@ typedef struct {
     uint64_t cache_pkg_num;
     uint64_t failed_recv_pkg[8];
     int web_msgid;
+    uint32_t study_hash_count;
+    uint32_t dns_hash_count;
+    uint32_t dynamic_hash_count;
+    uint32_t exceed_ac_state[8];
 }skbstat_t;
 int show_stat_init();
 extern skbstat_t *skb_stat;

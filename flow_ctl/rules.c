@@ -512,7 +512,7 @@ static int load_place()
             E("-------open place file [%s]  fail.\n", place_path);
             continue;
         }
-        printf("========pattern file[%s]\n", place_path);
+        //printf("========pattern file[%s]\n", place_path);
         while(fgets(line, 1024, fp))  {
             if (*line == '#')
                 continue;
@@ -901,7 +901,6 @@ static int load_pattern()
                         {
                             _strim(p);
                             key.dynamic_type = (0x80)|(int8_t)atoi(p);
-                            printf("key.dynamic_type=0x%x\n",key.dynamic_type);
                         }
                         break;
 #if 0
@@ -949,7 +948,6 @@ static int load_pattern()
                                     key.port_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.port_key, p, key.port_key_len);
-                                printf("ip_key[%s]\n", key.ip_key);
                             } else {
                                 key.port_key_len = sft_hstoh(p, key.port_key);
 
@@ -972,7 +970,6 @@ static int load_pattern()
                                     key.ip_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.ip_key, p, key.ip_key_len);
-                                printf("ip_key[%s]\n", key.ip_key);
                             } else {
                                 key.ip_key_len = sft_hstoh(p, key.ip_key);
 
@@ -995,7 +992,6 @@ static int load_pattern()
                                     key.ip_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.ip_key, p, key.ip_key_len);
-                                printf("login start key[%s]\n", key.ip_key);
                             } else {
                                 key.ip_key_len = sft_hstoh(p, key.ip_key);
 
@@ -1020,7 +1016,6 @@ static int load_pattern()
                                     key.port_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.port_key, p, key.port_key_len);
-                                printf("login end key[%s]\n", key.port_key);
                             } else {
                                 key.port_key_len = sft_hstoh(p, key.port_key);
 
@@ -1044,7 +1039,6 @@ static int load_pattern()
                                     key.ip_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.ip_key, p, key.ip_key_len);
-                                printf("login start key[%s]\n", key.ip_key);
                             } else {
                                 key.ip_key_len = sft_hstoh(p, key.ip_key);
 
@@ -1069,7 +1063,6 @@ static int load_pattern()
                                     key.port_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.port_key, p, key.port_key_len);
-                                printf("login end key[%s]\n", key.port_key);
                             } else {
                                 key.port_key_len = sft_hstoh(p, key.port_key);
 
@@ -1093,7 +1086,6 @@ static int load_pattern()
                                     key.ip_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.ip_key, p, key.ip_key_len);
-                                printf("login start key[%s]\n", key.ip_key);
                             } else {
                                 key.ip_key_len = sft_hstoh(p, key.ip_key);
 
@@ -1118,7 +1110,6 @@ static int load_pattern()
                                     key.port_key_len = DYNAMIC_KEYWORD_SIZE_MAX-1;
                                 }
                                 strncpy(key.port_key, p, key.port_key_len);
-                                printf("login end key[%s]\n", key.port_key);
                             } else {
                                 key.port_key_len = sft_hstoh(p, key.port_key);
 
@@ -1277,7 +1268,7 @@ static int load_pattern()
                     if (ret_status == 0) {
                         pattern_node->id = repeated_pattern_id;
                         strncpy(pattern_node->pattern_name, pattern_name, MAX_PATTRN_LEN - 1);
-                        printf("[%s]key.repeated=%d [%s]\n", pattern_name, key.repeated,pattern_node->pattern_key.pattern);
+                        //printf("[%s]key.repeated=%d [%s]\n", pattern_name, key.repeated,pattern_node->pattern_key.pattern);
                     }
                 } else {
                    LOG("no enought mem for pattern_node\n"); 
@@ -1521,12 +1512,11 @@ static int load_rules()
     char *pattern_list = NULL;    
     
     G_state_id_inc = 1;
-    D("------load rules-------------\n");
     list_for_each_entry(node, &pv.dpi_conf[RULE_TYPE].conf_head, list) {
 
         strncpy(rules_path, pv.key_lib_path, 128);
         strncat(rules_path, node->conf_name, 128 - strlen(node->conf_name));
-        printf("rules_path[%s]\n", rules_path);
+    //    printf("rules_path[%s]\n", rules_path);
         if ((fp = fopen(rules_path, "rb")) == NULL) {
             E("-------open rule file [%s] fail.\n", rules_path);
             continue;
@@ -1824,7 +1814,7 @@ static int load_proto_constant_nodemgt()
 					{	       
 						if(0 == study_flag)
 						{
-							study_cache_try_get(ip_network_addr_num, htons(port), type_id, 1);
+							study_cache_try_get(ip_network_addr_num, htons(port), type_id, 1, 0);
 						}
 						else
 						{
@@ -1838,7 +1828,7 @@ static int load_proto_constant_nodemgt()
 					port = port_stons(str_trim(toks[7]));//tokens[7] = min port = port, ignore tokens[8] = max port
 					if(0 == study_flag)
 					{
-						study_cache_try_get(ip_network_addr_num, port, type_id, 1);
+						study_cache_try_get(ip_network_addr_num, port, type_id, 1, 0);
 					}
 					else
 					{
@@ -1882,7 +1872,7 @@ static int load_proto_constant_nodemgt()
 				{	       
 					if(0 == study_flag)
 					{
-						study_cache_try_get(ip_network_addr_num, htons(port), type_id, 1);
+						study_cache_try_get(ip_network_addr_num, htons(port), type_id, 1, 0);
 					}
 					else
 					{
@@ -1896,7 +1886,7 @@ static int load_proto_constant_nodemgt()
 				port = port_stons(str_trim(toks[7]));//tokens[7] = min port = port, ignore tokens[8] = max port
 				if(0 == study_flag)
 				{
-					study_cache_try_get(ip_network_addr_num, port, type_id, 1);
+					study_cache_try_get(ip_network_addr_num, port, type_id, 1, 0);
 				}
 				else
 				{
@@ -1980,7 +1970,7 @@ static int load_user_proto()
             strncpy(user_udp_proto[port].name, toks[2], 31);
         } 
 
-        printf("user name[%s]type_id[%x]port[%u]\n", toks[2], type_id, port);
+        //printf("user name[%s]type_id[%x]port[%u]\n", toks[2], type_id, port);
 free_toks:
         memset(line, 0x00, 512);
         mSplitFree(&toks, num_toks);
@@ -2122,6 +2112,8 @@ static void get_comm_app_id()
 	pv.bt_download = get_app_class_id_by_name("bt_download"); 
 	pv.syn_ack = get_app_class_id_by_name("syn_ack"); 
 	pv.original = get_app_class_id_by_name("original"); 
+
+        pv.enhance_encrypt_bt = get_app_class_id_by_name("bt_enhance_encrypt"); 
 }
 int parse_dpi_conf()
 {

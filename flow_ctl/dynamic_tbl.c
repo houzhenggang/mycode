@@ -20,6 +20,7 @@
 #include "dynamic_tbl.h"
 #include "h_cache.h"
 #include "utils.h"
+#include "stat.h"
 
 #define DYNAMIC_RELOAD_TEST	
 
@@ -59,6 +60,7 @@ static void dynamic_cache_release_fn(struct h_scalar *he)
 {
 	struct dynamic_cache *dc = container_of(he, struct dynamic_cache, h_scalar);
 
+    skb_stat->dynamic_hash_count -- ;
     rte_mempool_mp_put(dynamic_cache_tbl.mem_cache[dc->lcore_id], dc);
 }
 
@@ -95,7 +97,8 @@ static struct h_scalar *dynamic_cache_create_fn(struct h_table *ht, void *key)
     dc->port = k->port;
     dc->proto_mark = k->proto_mark;
     dc->lcore_id = lcore_id;
-	rte_spinlock_init(&dc->lock);
+//	rte_spinlock_init(&dc->lock);
+    skb_stat->dynamic_hash_count ++ ;
 	return &dc->h_scalar;
 }
 
@@ -199,7 +202,7 @@ int dynamic_cache_init(void)
 		retv = ret;
 		goto err_dynamic_create;
     }
-	
+    skb_stat->dynamic_hash_count = 0;	
 	return 0;
 
 	

@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "dns_study_tbl.h"
 #include "utils.h"
+#include "stat.h"
 #include "com.h"
 
 static uint32_t g_hash_initval;
@@ -53,6 +54,7 @@ static int dns_study_cache_comp_key_fn(struct h_scalar *he, void *key)
 static void dns_study_cache_release_fn(struct h_scalar *he)
 {
 	struct dns_study_cache *sc = container_of(he, struct dns_study_cache, h_scalar);
+    skb_stat->dns_hash_count--;
     rte_mempool_mp_put(dns_study_cache_tbl.mem_cache[sc->lcore_id], sc);
 }
 
@@ -88,8 +90,10 @@ static struct h_scalar *dns_study_cache_create_fn(struct h_table *ht, void *key)
     sc->ip = k->ip;
     sc->port = k->port;
     sc->proto_mark = k->proto_mark;
-    sc->lcore_id = lcore_id; 
-	rte_spinlock_init(&sc->lock);
+    sc->lcore_id = lcore_id;
+     
+    skb_stat->dns_hash_count++;
+//	rte_spinlock_init(&sc->lock);
 	return &sc->h_scalar;
 }
 
@@ -182,6 +186,7 @@ int dns_study_cache_init(void)
 		goto err_dns_study_create;
     }
 	
+    skb_stat->dns_hash_count = 0;
 	return 0;
 
 	

@@ -268,22 +268,6 @@ out_unlock:
 
 	return ret;
 }
-
-/**
- * mod_timer_pending - modify a pending timer's timeout
- * @timer: the pending timer to be modified
- * @expires: new timeout in jiffies
- *
- * mod_timer_pending() is the same for pending timers as mod_timer(),
- * but will not re-activate and modify already deleted timers.
- *
- * It is useful for unserialized use of timers.
- */
-int mod_timer_pending(struct timer_list *timer, unsigned long expires)
-{
-	return __mod_timer(timer, expires, true, TIMER_NOT_PINNED);
-}
-
 /**
  * mod_timer - modify a timer's timeout
  * @timer: the timer to be modified
@@ -313,29 +297,7 @@ int mod_timer(struct timer_list *timer, unsigned long expires)
 	 */
 	if (timer_pending(timer) && timer->expires == expires)
 		return 1;
-
 	return __mod_timer(timer, expires, false, TIMER_NOT_PINNED);
-}
-
-/**
- * mod_timer_pinned - modify a timer's timeout
- * @timer: the timer to be modified
- * @expires: new timeout in jiffies
- *
- * mod_timer_pinned() is a way to update the expire field of an
- * active timer (if the timer is inactive it will be activated)
- * and not allow the timer to be migrated to a different CPU.
- *
- * mod_timer_pinned(timer, expires) is equivalent to:
- *
- *     del_timer(timer); timer->expires = expires; add_timer(timer);
- */
-int mod_timer_pinned(struct timer_list *timer, unsigned long expires)
-{
-	if (timer->expires == expires && timer_pending(timer))
-		return 1;
-
-	return __mod_timer(timer, expires, false, TIMER_PINNED);
 }
 
 /**
@@ -509,12 +471,14 @@ static int cascade(struct tvec_base *base, struct tvec *tv, int index)
  * This function cascades all vectors and executes all expired timer
  * vectors.
  */
-static inline void __run_timers(struct tvec_base *base)
+//static inline void __run_timers(struct tvec_base *base)
+inline void __run_timers(struct tvec_base *base)
 {
 	struct timer_list *timer;
 
+	uint8_t cpu = rte_lcore_id();
 	//rte_spinlock_lock(&base->lock);
-	while (time_after_eq(rte_rdtsc(), base->timer_jiffies)) {
+	while (time_after_eq(jiffies, base->timer_jiffies)) {
 		struct list_head work_list;
 		struct list_head *head = &work_list;
 		int index = base->timer_jiffies & TVR_MASK;
@@ -539,7 +503,6 @@ static inline void __run_timers(struct tvec_base *base)
 
 			set_running_timer(base, timer);
 			detach_timer(timer, 1);
-
 			//rte_spinlock_unlock(&base->lock);
 			{
 				fn(data);
@@ -558,11 +521,11 @@ run_local_timers(__attribute__((unused)) struct rte_timer *tim,
 	uint8_t cpu = rte_lcore_id();
     struct tvec_base *base = tvec_bases[cpu];
 
-
-    if (time_after_eq(rte_rdtsc(), base->timer_jiffies))
+    if (time_after_eq(jiffies, base->timer_jiffies))
         __run_timers(base);
 }
 
+struct rte_timer sft_timer[16];
 static int  init_timers_for_each_cpu()
 {
 	int i, j;
@@ -570,13 +533,14 @@ static int  init_timers_for_each_cpu()
 	uint8_t nb_lcores = rte_lcore_count();
 
 	for (i = 0; i < nb_lcores; i ++) {
-		base = rte_zmalloc(NULL, sizeof(*base), 0);	
+		//base = rte_zmalloc(NULL, sizeof(struct tvec_base), 0);	
+		base = calloc(1, sizeof(struct tvec_base));	
 		if (!base)
 			return -1;
 
 		/* Make sure that tvec_base is 2 byte aligned */
 		if (tbase_get_deferrable(base)) {
-			rte_free(base);
+			free(base);
 			return -1;
 		}
 		tvec_bases[i] = base;
@@ -591,14 +555,13 @@ static int  init_timers_for_each_cpu()
 		for (j = 0; j < TVR_SIZE; j++)
 			INIT_LIST_HEAD(base->tv1.vec + j);
 
-		base->timer_jiffies = rte_rdtsc();
+		base->timer_jiffies = jiffies;
 		base->next_timer = base->timer_jiffies;
 
-        struct rte_timer sft_timer;
-        rte_timer_init(&sft_timer);
+        rte_timer_init(&sft_timer[i]);
 
         /* load timer0, every second, on master lcore, reloaded automatically */
-        rte_timer_reset(&sft_timer, pv.hz, PERIODICAL, i, run_local_timers, NULL);
+        rte_timer_reset(&sft_timer[i], pv.hz, PERIODICAL, i, run_local_timers, NULL);
 
 	}
 

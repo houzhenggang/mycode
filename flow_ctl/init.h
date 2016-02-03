@@ -60,6 +60,7 @@ typedef struct _progvars
 	uint32_t bt_download;
 	uint32_t syn_ack;
     uint32_t original;
+    uint32_t enhance_encrypt_bt;
 	uint8_t qqlog;
     uint8_t urlog;
     int syslog_sd;
