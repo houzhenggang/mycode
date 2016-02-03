@@ -24,7 +24,7 @@
 
 #define STUDY_HASH_SIZE    (1 << 18)
 #define STUDY_MAX_LEN      (STUDY_HASH_SIZE * 8)
-#define STUDY_TIMEOUT      (120)
+#define STUDY_TIMEOUT      (1200)
 #define STUDY_OUTPUT_INTERVAL    (300)
     
 #define STUDY_RULE_RECHECK_TIMEOUT  10

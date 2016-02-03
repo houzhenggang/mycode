@@ -24,7 +24,6 @@
 #include "ftp.h"
 #include "acsmx2.h"
 #include "debug.h"
-#include "session_mgr.h"
 #include "rules.h"
 #include "dpi_dynamic.h"
 #include "dpi_login_analysis.h"

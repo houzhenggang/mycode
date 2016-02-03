@@ -196,7 +196,7 @@ int study_cache_init(void)
             goto err_kmem_create;
         }
     }
-    if(h_scalar_table_create(&study_cache_tbl.h_table, NULL, STUDY_HASH_SIZE, STUDY_MAX_LEN, 1200, &study_cache_ops) != 0){
+    if(h_scalar_table_create(&study_cache_tbl.h_table, NULL, STUDY_HASH_SIZE, STUDY_MAX_LEN, STUDY_TIMEOUT, &study_cache_ops) != 0){
 		retv = ret;
 		goto err_study_create;
     }

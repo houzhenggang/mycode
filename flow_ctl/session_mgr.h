@@ -120,8 +120,8 @@ struct sft_fdb_entry
     int                    recvdevn;     //where the skb recv dev sequence(ifindex)
     uint64_t           timestamp;    //timestamp
     unsigned short        vid ; //skb->vid
-    uint32_t        init_proto_mark;//conntrack already mark protocl
     uint32_t        proto_mark;//conntrack already mark protocl
+    uint32_t        init_proto_mark;
     uint32_t        prev_proto_mark;
     uint16_t            flag0:1,//1:drop
                         flag1:1,//1:recv fin or rst
@@ -131,7 +131,6 @@ struct sft_fdb_entry
                         slave:1,
                         keepalive:2,
                         proto_mark_state:1,
-                        proto_mark_finish:1,
                         is_http:1,
                         log_flag:1;
                         //new_link:1,
@@ -167,6 +166,7 @@ struct sft_fdb_entry
     int state_cnt;
     uint64_t    link_timestamp;    //timestamp
     uint32_t    pkt_cnt;
+    uint32_t    max_pkt_cnt;
     unsigned short ftp_id;
     char *ssn_ptr1;
     char *ssn_ptr2;

@@ -19,6 +19,7 @@
 #include "tcp_pack.h"
 #include "stat.h"
 #include "init.h"
+#include "config.h"
 
 #define RTE_LOGTYPE_L2CT RTE_LOGTYPE_USER1
 
@@ -68,12 +69,13 @@ static void sess_init(struct sft_fdb_entry *fdb, struct key_5tuple *key)
     fdb->sess_key.port_dst = key->port_dst;
     fdb->sess_key.proto = key->proto;
     fdb->prev_proto_mark = pv.original;
+    fdb->max_pkt_cnt = COMMON_MAX_PKT_NUM;
     if (key->is_syn) {
        fdb->proto_mark = pv.syn_ack;
        fdb->init_proto_mark = pv.syn_ack;
     } else {
         fdb->proto_mark = 0;
-        fdb->init_proto_mark = 0;
+       fdb->init_proto_mark = 0;
     }
 
 //    fdb->identifies_proto = 0;

@@ -2,7 +2,9 @@
 #define __PATTERN_TBL_H__
 #include "config.h"
 #include "h_cache.h"
+#include "session_mgr.h"
 #include "dpi.h"
+#include "com.h"
 
 struct pattern_key
 {
