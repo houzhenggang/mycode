@@ -107,28 +107,6 @@ void scalar_timer_func(unsigned long data)
         call_rcu(&he->rcu, h_scalar_free_rcu);
 }
 
-void queue_timer_func(struct rte_timer *tim, void *data)
-{
-
-    struct h_scalar *he;
-    uint64_t ptr;
-    int count = 0;
-
-    do {
-        if (likely(__kfifo_get(pv.hash_do_queue[rte_lcore_id()],
-                     &ptr, 8)) == 8) {
-            he = (struct h_scalar *)ptr;
-            struct h_bucket *b = he->bucket;
-            rte_atomic16_dec(&b->bucket_level);
-            rte_spinlock_lock(&b->lock);
-            cds_list_del_rcu(&he->list);
-            rte_spinlock_unlock(&b->lock);
-            call_rcu(&he->rcu, h_scalar_free_rcu);
-
-        }
-    }while (++count < 500 && he);
-}
-
 
 int h_scalar_try_get(struct h_table *ht, void *key, struct h_scalar **ret_he,
 		struct h_scalar *(*create)(struct h_table *, void *),
@@ -138,7 +116,6 @@ int h_scalar_try_get(struct h_table *ht, void *key, struct h_scalar **ret_he,
 	struct h_bucket *b = &ht->base[ht->s_ops->hash(key) & (ht->size - 1)];
 	struct h_scalar *he = NULL;
 //	struct h_scalar *p = NULL;
-    uint16_t bucket_level = 0;
 
 	rcu_read_lock();
 //    cds_list_for_each_entry_safe(he, p, &b->chain, list) {
@@ -162,14 +139,12 @@ int h_scalar_try_get(struct h_table *ht, void *key, struct h_scalar **ret_he,
 	//	rte_spinlock_unlock(&b->lock);
 		return -1;
 	}
-	if(unlikely((bucket_level = rte_atomic16_read(&b->bucket_level)) > 30 || (he = create(ht, key)) == NULL))
+	if(unlikely((he = create(ht, key)) == NULL))
 	{
-        LOG("hash bucket is %u\n",bucket_level);
         *ret_he = NULL;
 		//rte_spinlock_unlock(&b->lock);
 		return -1;
 	}
-    rte_atomic16_inc(&b->bucket_level);
     *ret_he = he;
 	/* Intialize the base class. */
 	he->bucket = b;
@@ -392,7 +367,6 @@ void h_scalar_table_release(struct h_table *ht)
 int __h_table_create(struct h_table *ht, enum __h_table_type table_type,
         struct h_bucket *base, size_t size, size_t max_len, uint64_t timeo,
         struct h_operations *ops)
-
 {
 
     struct h_bucket *b;
